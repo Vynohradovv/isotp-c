@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 /* user implemented, print debug message */
-void isotp_user_debug(const char* message, ...);
+void isotp_user_debug(const char* message);
 
 /* user implemented, send can message. should return ISOTP_RET_OK when success.
 */

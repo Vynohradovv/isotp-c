@@ -3,10 +3,9 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#ifdef __cplusplus
 #include <stdint.h>
 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -23,7 +22,7 @@ typedef struct IsoTpLink {
     /* sender paramters */
     uint32_t                    send_arbitration_id; /* used to reply consecutive frame */
     /* message buffer */
-    uint8_t*                    send_buffer;
+    const void*                 send_buffer;
     uint16_t                    send_buf_size;
     uint16_t                    send_size;
     uint16_t                    send_offset;
@@ -41,7 +40,7 @@ typedef struct IsoTpLink {
     /* receiver paramters */
     uint32_t                    receive_arbitration_id;
     /* message buffer */
-    uint8_t*                    receive_buffer;
+    const void*                 receive_buffer;
     uint16_t                    receive_buf_size;
     uint16_t                    receive_size;
     uint16_t                    receive_offset;
@@ -57,15 +56,15 @@ typedef struct IsoTpLink {
 
 /**
  * @brief Initialises the ISO-TP library.
- *
- * @param link The @code IsoTpLink @endcode instance used for transceiving data.
+ * 
  * @param sendid The ID used to send data to other CAN nodes.
  * @param sendbuf A pointer to an area in memory which can be used as a buffer for data to be sent.
  * @param sendbufsize The size of the buffer area.
  * @param recvbuf A pointer to an area in memory which can be used as a buffer for data to be received.
  * @param recvbufsize The size of the buffer area.
+ * @return The @code IsoTpLink @endcode instance used for transceiving data.
  */
-void isotp_init_link(IsoTpLink *link, uint32_t sendid, 
+IsoTpLink* isotp_init_link(uint32_t sendid, 
                      uint8_t *sendbuf, uint16_t sendbufsize,
                      uint8_t *recvbuf, uint16_t recvbufsize);
 
@@ -83,8 +82,9 @@ void isotp_poll(IsoTpLink *link);
  * @param link The @code IsoTpLink @endcode instance used for transceiving data.
  * @param data The data received via CAN.
  * @param len The length of the data received.
+ * @return ISOTP_RET_OK 
  */
-void isotp_on_can_message(IsoTpLink *link, uint8_t *data, uint8_t len);
+int isotp_on_can_message(IsoTpLink *link, const uint8_t *data, uint8_t len);
 
 /**
  * @brief Sends ISO-TP frames via CAN, using the ID set in the initialising function.

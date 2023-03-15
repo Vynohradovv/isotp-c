@@ -6,7 +6,7 @@
  *************************************************************/
 #ifdef __GNUC__
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define ISOTP_BYTE_ORDER_LITTLE_ENDIAN
+
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #else
 #error "unsupported byte ordering"
@@ -21,7 +21,6 @@
 #endif
 
 #ifdef _WIN32
-#define ISOTP_BYTE_ORDER_LITTLE_ENDIAN
 #define __builtin_bswap8  _byteswap_uint8
 #define __builtin_bswap16 _byteswap_uint16
 #define __builtin_bswap32 _byteswap_uint32
@@ -39,6 +38,7 @@
 #define ISOTP_RET_NO_DATA      -5
 #define ISOTP_RET_TIMEOUT      -6
 #define ISOTP_RET_LENGTH       -7
+#define ISOTP_RET_HW_NOTREADY  -8
 
 /* return logic true if 'a' is after 'b' */
 #define IsoTpTimeAfter(a,b) ((int32_t)((int32_t)(b) - (int32_t)(a)) < 0)
@@ -61,41 +61,7 @@ typedef enum {
 } IsoTpReceiveStatusTypes;
 
 /* can fram defination */
-#if defined(ISOTP_BYTE_ORDER_LITTLE_ENDIAN)
-typedef struct {
-    uint8_t reserve_1:4;
-    uint8_t type:4;
-    uint8_t reserve_2[7];
-} IsoTpPciType;
-
-typedef struct {
-    uint8_t SF_DL:4;
-    uint8_t type:4;
-    uint8_t data[7];
-} IsoTpSingleFrame;
-
-typedef struct {
-    uint8_t FF_DL_high:4;
-    uint8_t type:4;
-    uint8_t FF_DL_low;
-    uint8_t data[6];
-} IsoTpFirstFrame;
-
-typedef struct {
-    uint8_t SN:4;
-    uint8_t type:4;
-    uint8_t data[7];
-} IsoTpConsecutiveFrame;
-
-typedef struct {
-    uint8_t FS:4;
-    uint8_t type:4;
-    uint8_t BS;
-    uint8_t STmin;
-    uint8_t reserve[5];
-} IsoTpFlowControl;
-
-#else
+#if defined( ISOTP_BYTE_ORDER_BIG_ENDIAN )
 
 typedef struct {
     uint8_t type:4;
@@ -165,6 +131,41 @@ typedef struct {
 typedef struct {
     uint8_t type:4;
     uint8_t FS:4;
+    uint8_t BS;
+    uint8_t STmin;
+    uint8_t reserve[5];
+} IsoTpFlowControl;
+
+#else
+
+typedef struct {
+    uint8_t reserve_1:4;
+    uint8_t type:4;
+    uint8_t reserve_2[7];
+} IsoTpPciType;
+
+typedef struct {
+    uint8_t SF_DL:4;
+    uint8_t type:4;
+    uint8_t data[7];
+} IsoTpSingleFrame;
+
+typedef struct {
+    uint8_t FF_DL_high:4;
+    uint8_t type:4;
+    uint8_t FF_DL_low;
+    uint8_t data[6];
+} IsoTpFirstFrame;
+
+typedef struct {
+    uint8_t SN:4;
+    uint8_t type:4;
+    uint8_t data[7];
+} IsoTpConsecutiveFrame;
+
+typedef struct {
+    uint8_t FS:4;
+    uint8_t type:4;
     uint8_t BS;
     uint8_t STmin;
     uint8_t reserve[5];
